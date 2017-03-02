@@ -2,6 +2,54 @@
 
 $(document).ready( function() {
 
+
+function grabGifs(elem){
+
+        // console.log("elem: " + elem);
+        $("#test").empty();
+        console.log("this: " + this);
+        // var miscText = elem.value;
+        var miscText = $(this).text();
+        console.log(miscText);
+        var queryURL = "http://api.giphy.com/v1/gifs/search?q="+escape(miscText)+"&api_key=dc6zaTOxFJmzC&limit=10&offset=0"
+        console.log("queryURL:" + queryURL);
+
+        $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+            .done(function(response) {
+
+
+                console.log(response);
+                // console.log(response.data[0].images.original.url);
+                console.log("Image of Enter Ajax is:" + response.data["0"].images.original.url);
+
+                for(var i =0; i < response.data.length; i++){
+                    var gifDiv = $("<div class='item'>");
+
+                var imageTest = $("<img>");
+                imageTest.attr("src", response.data[i].images.original.url);
+                imageTest.attr("alt", "NoImage");
+                imageTest.attr("width", "200px");
+                imageTest.attr("height", "200px");
+
+                var rating = response.data[i].rating;
+
+                var p = $('<p>').text("Rating: " + rating);
+
+                gifDiv.prepend(p);
+                gifDiv.prepend(imageTest);
+
+
+                $("#test").append(gifDiv);
+                
+                }
+            });
+
+            
+    }
+
 	 var globalArray = [];
 
 
@@ -18,8 +66,6 @@ $(document).ready( function() {
 
     $("#submitGif").on("click", function() {
         clickFunction();
-
-
 
     });
     //Populating Buttons
@@ -38,7 +84,7 @@ $(document).ready( function() {
 
     var clickFunction = function() {
     		
-
+        $("#test").empty();
             var gettingInput = $("#gifTextInput").val();
 
             console.log("gettingInput: " + gettingInput);
@@ -47,7 +93,8 @@ $(document).ready( function() {
 
             // escape(gettingInput)
 
-            var queryURL = "http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag=" + escape(gettingInput);
+            // var queryURL = "http://api.giphy.com/v1/gifs/limit=10&random?&api_key=dc6zaTOxFJmzC&limit=2&tag=" + escape(gettingInput);
+            var queryURL = "http://api.giphy.com/v1/gifs/search?q="+escape(gettingInput)+"&api_key=dc6zaTOxFJmzC&limit=10&offset=0"
 
             // var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + gettingInput.replace(" ", "+") + "&random?&api_key=dc6zaTOxFJmzC";
 
@@ -67,21 +114,42 @@ $(document).ready( function() {
             .done(function(response) {
             	
 
+
                 console.log(response);
                 // console.log(response.data[0].images.original.url);
-                console.log(response.data.image_original_url);
+                console.log("Image of Enter Ajax is:" + response.data["0"].images.original.url);
+
+                for(var i =0; i < response.data.length; i++){
+                    var gifDiv = $("<div class='item'>");
 
                 var imageTest = $("<img>");
-                imageTest.attr("src", response.data.image_original_url);
+                imageTest.attr("src", response.data[i].images.original.url);
                 imageTest.attr("alt", "NoImage");
+                imageTest.attr("width", "200px");
+                imageTest.attr("height", "200px");
 
-                var p = $("<p>");
-                $("#test").append(imageTest);
+                var rating = response.data[i].rating;
+
+                var p = $('<p>').text("Rating: " + rating);
+
+                gifDiv.prepend(p);
+                gifDiv.prepend(imageTest);
+
+
+                $("#test").append(gifDiv);
+                
+
+                
+
+                
+                }
 
                 if (globalArray[gettingInput] == null) {
                 	
                     // $("#addButtons").append("<button id='B" + Math.floor(Math.random()) + "' onClick=dynamicGifCall(this)>" + gettingInput + "</button>");
-                    $("#addButtons").append("<button id='B" + Math.floor(Math.random() * 1000)+ "' class='dynamicButtons'>" + gettingInput + "</button>");
+                    var newButton = $("<button class='dynamicButtons' >" + gettingInput + "</button>");
+                    newButton.on("click", grabGifs);
+                    $("#addButtons").append(newButton);
 
                 } else {
                     globalArray.push(gettingInput);
@@ -99,42 +167,7 @@ $(document).ready( function() {
 
          // })
 
-         $(document).click('.dynamicButtons', function() {
-            var buttonId = $(this).attr('class');
-            console.log("buttonId: " + buttonId)
-            console.log("this: " + $(this).attr('id'));            
-         })
 
     // var dynamicGifCall = function(elem) {
-    	$("#addButtons").on("click", function(elem){
-
-
-    		
-        var miscText = elem.value;
-        console.log(miscText);
-        var queryURL = "http://api.giphy.com/v1/gifs/random?&api_key=dc6zaTOxFJmzC&tag=" + escape(miscText);
-
-        $.ajax({
-                url: queryURL,
-                method: "GET"
-            })
-            .done(function(response) {
-
-                console.log(response);
-                // console.log(response.data[0].images.original.url);
-                console.log(response.data.image_original_url)
-
-                var imageTest = $("<img>");
-
-                imageTest.attr("src", response.data.image_original_url);
-
-                imageTest.attr("alt", "NoImage");
-
-                var p = $("<p>");
-                $("#test").append(imageTest);
-            });
-    })
-
-
-	
-})
+    $(".dynamicButtons").on("click", grabGifs);	
+});
